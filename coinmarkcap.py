@@ -1,20 +1,32 @@
-import urllib2, json
-url = urllib2.urlopen('https://api.coinmarketcap.com/v1/ticker')
-obj = json.load(url)
+import requests
+
+c = requests.session()
+url = "https://api.coinmarketcap.com/v1/ticker"
+
 
 def get_coins():
-    for row in obj:
-        if (int(float(row['market_cap_usd']))	< 250000000): #if coin is less than $250,000,000 market cap
-            if (float(row['total_supply']) < 50000000): # if coin is less than 50,000,000 total supply
-                print "Name:", row['name']
-                print "Symbol:", row['symbol']
-                print "BTC:", row['price_btc']
-                print "Volume (24h):", "{:,}".format(float(row['24h_volume_usd']));
-                print "Market Cap:", "{:,}".format(float(row['market_cap_usd']));
-                print "Supply:","{:,}".format(float(row['total_supply']));
-                print "Circulating Supply:", "{:,}".format(float(row['available_supply']));
-                print "% Change (24hr):", row['percent_change_24h']
-                print ""
+    res = c.get(url)
+    if res.status_code != 200:
+        print "WARNING: Status code is not 200 - " + url
+
+    for row in res.json():
+        if (float(row['market_cap_usd']) < 250000000.0 and float(
+                row['total_supply']) < 50000000.0):  # if coin is less than $250,000,000 market cap
+            print "Name:", row['name']
+            print "Symbol:", row['symbol']
+            print "BTC:", row['price_btc']
+            print "Volume (24h):", "{:,}".format(float(row['24h_volume_usd']))
+            print "Market Cap:", "{:,}".format(float(row['market_cap_usd']))
+            print "Supply:", "{:,}".format(float(row['total_supply']))
+            print "Circulating Supply:", "{:,}".format(float(row['available_supply']))
+            print "% Change (24hr):", row['percent_change_24h']
+            print ""
+
+
 if __name__ == "__main__":
-    get_coins()
-raw_input('press any key to close')
+    try:
+        get_coins()
+    except Exception as e:
+        print "ERROR: Couldn't get coins... Exception: " + str(e)
+
+    raw_input('press any key to close')
