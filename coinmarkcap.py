@@ -3,6 +3,8 @@ import requests
 c = requests.session()
 url = "https://api.coinmarketcap.com/v1/ticker"
 
+MAX_MARKET_CAP = 250000000
+MAX_SUPPLY = 50000000
 
 def get_coins():
     res = c.get(url)
@@ -10,8 +12,8 @@ def get_coins():
         print "WARNING: Status code is not 200 - " + url
 
     for row in res.json():
-        if (float(row['market_cap_usd']) < 250000000.0 and float(
-                row['total_supply']) < 50000000.0):  # if coin is less than $250,000,000 market cap
+        if (float(row['market_cap_usd']) < MAX_MARKET_CAP and float(
+                row['total_supply']) < MAX_SUPPLY):  # if coin is less than $250,000,000 market cap
             print "Name:", row['name']
             print "Symbol:", row['symbol']
             print "BTC:", row['price_btc']
